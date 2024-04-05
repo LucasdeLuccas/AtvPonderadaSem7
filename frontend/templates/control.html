@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Ponderada_robo_semana_7</title>
+    <style>
+        /* Estilos adicionais podem ser necessários para o alinhamento exato */
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .content {
+            flex-grow: 1;
+            background-color: #fff;
+            padding: 20px;
+        }
+        /* Estilos para a barra de navegação */
+        .nav-item .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 75px;
+        }
+        .nav-link .bi {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">
+                                <i class="bi bi-house-door"></i>
+                                <span class="ml-2">Home</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/control">
+                                <i class="bi bi-joystick"></i>
+                                <span class="ml-2">Controle</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/log">
+                                <i class="bi bi-clipboard-data"></i>
+                                <span class="ml-2">Logs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        
+            <div class="col-sm p-3 min-vh-100">
+              <div class="container mt-5">
+                <h3>Instruções do Robô</h3>
+                <ul class="list-group list-group-flush">
+                    <!-- Para o botão HOME -->
+                  <button type="button" class="btn btn-primary" ...>
+                    <i class="bi bi-house"></i> <!-- Escolha o ícone que você quer -->
+                    HOME
+                  </button>
+
+                  <!-- Para o botão POSIÇÃO ATUAL -->
+                  <button type="button" class="btn btn-info" ...>
+                    <i class="bi bi-geo-alt"></i> <!-- Escolha o ícone que você quer -->
+                    POSIÇÃO ATUAL
+                  </button>
+
+                  <!-- Para o botão Desligar/Ligar Equipamento -->
+                  <button type="button" class="btn btn-danger" ...>
+                    <i class="bi bi-toggle-off"></i> <!-- Escolha o ícone que você quer -->
+                    Desligar/Ligar Equipamento
+                  </button>
+
+                  <!-- Para o botão MOVER ROBÔ -->
+                  <button type="button" class="btn btn-success" ...>
+                    <i class="bi bi-arrow-up-square"></i> <!-- Escolha o ícone que você quer -->
+                    MOVER ROBÔ
+                  </button>
+
+                </ul>
+            </div>
+
+                      <!-- Modal para Coordenadas -->
+                      <div class="modal fade" id="coordenadasModal" tabindex="-1" role="dialog" aria-labelledby="coordenadasModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="coordenadasModalLabel">Inserir Coordenadas Desejadas</h5>
+                              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <!-- Adicionado id e method no formulário -->
+                              <form id="form-coordenadas">
+                                <div class="form-group">
+                                  <label for="coordenada-x">X</label>
+                                  <input type="text" class="form-control" id="coordenada-x" name="x">
+                                </div>
+                                <div class="form-group">
+                                  <label for="coordenada-y">Y</label>
+                                  <input type="text" class="form-control" id="coordenada-y" name="y">
+                                </div>
+                                <div class="form-group">
+                                  <label for="coordenada-z">Z</label>
+                                  <input type="text" class="form-control" id="coordenada-z" name="z">
+                                </div>
+                                <div class="form-group">
+                                  <label for="rotacao-r">Rotação R</label>
+                                  <input type="text" class="form-control" id="coordenada-r" name="r">
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                  <!-- Ajustes no botão para mandar formulário HTMX -->
+                                  <button type="submit" class="btn btn-primary" id="submit-coordenadas" hx-post="/movimentacao" hx-target="#invisible">Mover Robô</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                    
+
+    <!-- Modal atuador -->
+    <div class="modal fade" id="actuatorModal" tabindex="-1" aria-labelledby="actuatorModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="actuatorModalLabel">Controlar Atuador</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="actuatorModalBody">
+                  <p>O atuador está <span id="actuatorStatus">desligado</span>.</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <!-- Botão para mudar estado do atuador -->
+                  <button type="button" class="btn btn-primary" hx-post="/equipamentos" hx-target="#actuatorModalBody" hx-swap="innerHTML">
+                      Mudar Estado
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal posição atual -->
+
+<div class="modal fade" id="genericModal" tabindex="-1" aria-labelledby="genericModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="genericModalLabel">Posição Atual do Robô</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="genericModalBody">
+        <!-- Os dados da posição serão inseridos aqui -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Voltar para HOME -->
+<div class="modal fade" id="homeModal" tabindex="-1" aria-labelledby="homeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="homeModalLabel">Ação Executada</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="homeModalBody">
+              <p>Voltando para Home</p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div id="invisible" style="display:none;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    
+    document.body.addEventListener('htmx:afterOnLoad', function(event) {
+    if (event.detail.path === '/posicao_atual') {
+        var response = JSON.parse(event.detail.xhr.responseText);
+        var content;
+        if (response.error) {
+            content = `<p>${response.error}</p>`;
+        } else {
+            content = `<p>X: ${response.x}, Y: ${response.y}, Z: ${response.z}, R: ${response.r}</p>`;
+        }
+        document.getElementById('genericModalBody').innerHTML = content;
+    }
+});
+      
+    </script>
+</body>
+</html>
+
